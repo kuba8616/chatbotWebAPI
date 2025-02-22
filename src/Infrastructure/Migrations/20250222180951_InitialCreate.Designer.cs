@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatbotAI.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250221182514_InitialCreate")]
+    [Migration("20250222180951_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -60,12 +60,17 @@ namespace ChatbotAI.Infrastructure.Migrations
                     b.Property<int>("ChatMessageId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatMessageId");
+                    b.HasIndex("ChatMessageId")
+                        .IsUnique();
 
                     b.ToTable("ChatResponses");
                 });
@@ -73,12 +78,17 @@ namespace ChatbotAI.Infrastructure.Migrations
             modelBuilder.Entity("ChatbotAI.Domain.Entities.ChatResponse", b =>
                 {
                     b.HasOne("ChatbotAI.Domain.Entities.ChatMessage", "ChatMessage")
-                        .WithMany()
-                        .HasForeignKey("ChatMessageId")
+                        .WithOne("Response")
+                        .HasForeignKey("ChatbotAI.Domain.Entities.ChatResponse", "ChatMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ChatMessage");
+                });
+
+            modelBuilder.Entity("ChatbotAI.Domain.Entities.ChatMessage", b =>
+                {
+                    b.Navigation("Response");
                 });
 #pragma warning restore 612, 618
         }

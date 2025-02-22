@@ -13,7 +13,7 @@ public class ChatResponseConfiguration : IEntityTypeConfiguration<ChatResponse>
                .UseIdentityColumn();
 
         builder.HasOne(r => r.ChatMessage)
-               .WithMany()
-               .HasForeignKey(r => r.ChatMessageId);
+               .WithOne(m => m.Response)
+               .HasForeignKey<ChatResponse>(r => r.ChatMessageId);
     }
 }

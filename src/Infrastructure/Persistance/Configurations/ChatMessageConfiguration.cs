@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ChatbotAI.Domain.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using ChatbotAI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChatbotAI.Infrastructure.Persistance.Configurations;
 public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
@@ -24,6 +19,10 @@ public class ChatMessageConfiguration : IEntityTypeConfiguration<ChatMessage>
         builder.Property(m => m.CreatedAt)
                .IsRequired();
 
-       
+        builder.HasOne(m => m.Response)
+           .WithOne(r => r.ChatMessage)
+           .HasForeignKey<ChatResponse>(r => r.ChatMessageId);
+
+
     }
 }

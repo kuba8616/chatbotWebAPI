@@ -6,5 +6,6 @@
         public string Content { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsUserMessage { get; set; }
+        public ChatResponse? Response { get; set; }
     }
 }

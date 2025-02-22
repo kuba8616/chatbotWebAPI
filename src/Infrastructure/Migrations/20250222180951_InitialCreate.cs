@@ -33,6 +33,7 @@ namespace ChatbotAI.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ChatMessageId = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -49,7 +50,8 @@ namespace ChatbotAI.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ChatResponses_ChatMessageId",
                 table: "ChatResponses",
-                column: "ChatMessageId");
+                column: "ChatMessageId",
+                unique: true);
         }
 
         /// <inheritdoc />
