@@ -28,7 +28,7 @@ namespace ChatbotAI.Application.UnitTests.Chat.Commands.RateChatResponse
             // Arrange
             var command = new RateChatResponseCommand { ResponseId = 1, Rating = Rating.Like };
             var cancellationToken = CancellationToken.None;
-            var chatResponse = new ChatResponse { Id = command.ResponseId };
+            var chatResponse = new ChatResponse { Id = command.ResponseId, ChatMessage = new ChatMessage() { Id = 1 } };
 
             _dbContextMock.Setup(db => db.ChatResponses.FindAsync(command.ResponseId))
                 .ReturnsAsync(chatResponse);

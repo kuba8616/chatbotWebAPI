@@ -1,4 +1,5 @@
-﻿using ChatbotAI.Application.Interfaces.Services;
+﻿using System.Collections.Concurrent;
+using ChatbotAI.Application.Interfaces.Services;
 
 namespace ChatbotAI.Infrastructure.Services.Chatbot
 {
@@ -51,14 +52,19 @@ namespace ChatbotAI.Infrastructure.Services.Chatbot
               Jeśli chcesz, możesz podzielić się szczegółami, a postaram się doradzić w sposób zgodny z zasadami i dobrymi praktykami."
         };
 
-        public async Task<string> GenerateResponseAsync(string userMessage, CancellationToken cancellationToken)
+        private readonly ConcurrentDictionary<int, CancellationTokenSource> _activeTasks = new();
+
+        public async Task<string> GenerateResponseAsync(string userMessage, int responseId, CancellationToken cancellationToken)
         {
+            var cts = new CancellationTokenSource();
+            _activeTasks.TryAdd(responseId, cts);
+
             try
             {
-                await Task.Delay(Random.Shared.Next(500, 2000), cancellationToken);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+                await Task.Delay(Random.Shared.Next(500, 2000), linkedCts.Token);
 
-                // Jeśli anulowanie zostało zainicjowane, rzuć wyjątek
-                if (cancellationToken.IsCancellationRequested)
+                if (linkedCts.Token.IsCancellationRequested)
                 {
                     throw new TaskCanceledException("Generowanie odpowiedzi zostało anulowane.");
                 }
@@ -73,8 +79,20 @@ namespace ChatbotAI.Infrastructure.Services.Chatbot
             }
             catch (TaskCanceledException)
             {
-                // Zwracanie częściowej odpowiedzi lub pustego ciągu, jeśli anulowano
                 return "Generowanie odpowiedzi przerwane...";
+            }
+            finally
+            {
+                _activeTasks.TryRemove(responseId, out _);
+            }
+        }
+
+        public void CancelResponse(int responseId)
+        {
+            if (_activeTasks.TryGetValue(responseId, out var cts))
+            {
+                cts.Cancel();
+                _activeTasks.TryRemove(responseId, out _);
             }
         }
     }

@@ -23,11 +23,11 @@ public class ChatbotResponseGeneratorTests
         var expectedResponse = "Hello Response";
         var cancellationToken = CancellationToken.None;
 
-        _chatbotResponseGeneratorMock.Setup(gen => gen.GenerateResponseAsync(inputMessage, cancellationToken))
+        _chatbotResponseGeneratorMock.Setup(gen => gen.GenerateResponseAsync(inputMessage, 1, cancellationToken))
             .ReturnsAsync(expectedResponse);
 
         // Act
-        var response = await _chatbotResponseGeneratorMock.Object.GenerateResponseAsync(inputMessage, cancellationToken);
+        var response = await _chatbotResponseGeneratorMock.Object.GenerateResponseAsync(inputMessage, 1, cancellationToken);
 
         // Assert
         response.Should().Be(expectedResponse);

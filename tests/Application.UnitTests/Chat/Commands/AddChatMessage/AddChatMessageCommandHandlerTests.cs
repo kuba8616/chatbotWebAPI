@@ -18,6 +18,7 @@ public class AddChatMessageCommandHandlerTests
 {
     private Mock<IApplicationDbContext> _dbContextMock;
     private Mock<IChatbotResponseGenerator> _chatbotResponseGeneratorMock;
+    private Mock<TimeProvider> _mockTimeProvider;
     private AddChatMessageCommandHandler _handler;
 
     [SetUp]
@@ -25,18 +26,20 @@ public class AddChatMessageCommandHandlerTests
     {
         _dbContextMock = new Mock<IApplicationDbContext>();
         _chatbotResponseGeneratorMock = new Mock<IChatbotResponseGenerator>();
-        _handler = new AddChatMessageCommandHandler(_dbContextMock.Object, _chatbotResponseGeneratorMock.Object);
+        _mockTimeProvider = new Mock<TimeProvider>();
+        _mockTimeProvider.Setup(tp => tp.GetUtcNow()).Returns(() => new DateTimeOffset(2025, 2, 23, 12, 0, 0, TimeSpan.Zero));
+        _handler = new AddChatMessageCommandHandler(_dbContextMock.Object, _chatbotResponseGeneratorMock.Object, _mockTimeProvider.Object);
     }
 
     [Test]
     public async Task Handle_ShouldReturnSuccess_WhenMessageIsAdded()
     {
         // Arrange
-        var command = new AddChatMessageCommand { Content = "Hello!" };
+        var command = new AddChatMessageCommand { Content = "Hello!", ResponseId = 1 };
         var cancellationToken = CancellationToken.None;
         var chatbotResponse = "Hello, how can I help you?";
 
-        _chatbotResponseGeneratorMock.Setup(gen => gen.GenerateResponseAsync(command.Content, cancellationToken))
+        _chatbotResponseGeneratorMock.Setup(gen => gen.GenerateResponseAsync(command.Content, 1, cancellationToken))
             .ReturnsAsync(chatbotResponse);
 
         _dbContextMock.Setup(db => db.ChatMessages.Add(It.IsAny<ChatMessage>()));

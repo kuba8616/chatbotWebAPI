@@ -29,7 +29,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IChatbotResponseGenerator, SimpleChatbotResponseGenerator>();
+        services.AddSingleton<IChatbotResponseGenerator, SimpleChatbotResponseGenerator>();
 
         return services;
     }

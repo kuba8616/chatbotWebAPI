@@ -1,11 +1,12 @@
-﻿using ChatbotAI.Application.Common;
+﻿using ChatbotAI.Application.Chat.Commands.AddChatMessage;
+using ChatbotAI.Application.Common;
 using ChatbotAI.Application.Common.Constants;
 using ChatbotAI.Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatbotAI.Application.Chat.Queries.GetChatHistory;
-public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, Result<List<ChatMessageDto>>>
+public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, Result<List<ChatResponseDto>>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -14,23 +15,22 @@ public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, R
         _context = context;
     }
 
-    public async Task<Result<List<ChatMessageDto>>> Handle(GetChatHistoryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<ChatResponseDto>>> Handle(GetChatHistoryQuery request, CancellationToken cancellationToken)
     {
-        var result = await _context.ChatMessages
-            .AsNoTracking()
-            .Include(c => c.Response)
-            .OrderByDescending(c => c.CreatedAt)
-            .Select(c => new ChatMessageDto
+        var result = await _context.ChatResponses
+            .Include(x => x.ChatMessage)
+            .OrderBy(r => r.Id)
+            .Select(r => new ChatResponseDto
             {
-                Id = c.Id,
-                Message = c.Content,
-                Response = c.Response != null ? c.Response.Content : "",
-                Rating = c.Response != null ? c.Response.Rating : null
+                Id = r.Id,
+                Message = r.ChatMessage.Content,
+                Response = r.Content,
+                Rating = r.Rating,
+                IsCancelled = r.IsCancelled
             })
             .ToListAsync(cancellationToken);
 
-        return result.Any()
-            ? Result<List<ChatMessageDto>>.Ok(result)
-            : Result<List<ChatMessageDto>>.Fail(ErrorMessages.ChatHistoryNotFound);
+        return Result<List<ChatResponseDto>>.Ok(result);
+            
     }
 }

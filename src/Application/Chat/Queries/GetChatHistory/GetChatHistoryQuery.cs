@@ -1,6 +1,7 @@
-﻿using ChatbotAI.Application.Common.Models;
+﻿using ChatbotAI.Application.Chat.Commands.AddChatMessage;
+using ChatbotAI.Application.Common.Models;
 using MediatR;
 
 namespace ChatbotAI.Application.Chat.Queries.GetChatHistory;
 
-public record GetChatHistoryQuery() : IRequest<Result<List<ChatMessageDto>>>;
+public record GetChatHistoryQuery() : IRequest<Result<List<ChatResponseDto>>>;

@@ -1,4 +1,5 @@
 ﻿using ChatbotAI.Application.Chat.Commands.AddChatMessage;
+using ChatbotAI.Application.Chat.Commands.CancelChatResponse;
 using ChatbotAI.Application.Chat.Commands.RateChatResponse;
 using ChatbotAI.Application.Chat.Queries.GetChatHistory;
 using ChatbotAI.Application.Common.Models;
@@ -11,8 +12,8 @@ public class ChatController : BaseController
     public ChatController(IMediator mediator) : base(mediator) { }
 
     [HttpGet("history")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<List<ChatMessageDto>>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Result<List<ChatMessageDto>>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<List<ChatResponseDto>>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Result<List<ChatResponseDto>>))]
     public async Task<IActionResult> GetChatHistory()
     {
         var result = await _mediator.Send(new GetChatHistoryQuery());
@@ -37,6 +38,15 @@ public class ChatController : BaseController
             return BadRequest("Mismatched response ID.");
         }
 
+        var result = await _mediator.Send(command);
+        return HandleResult(result);
+    }
+
+    [HttpPost("cancel")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<bool>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Result<bool>))]
+    public async Task<IActionResult> CancelResponse([FromBody] CancelChatResponseCommand command)
+    {
         var result = await _mediator.Send(command);
         return HandleResult(result);
     }
