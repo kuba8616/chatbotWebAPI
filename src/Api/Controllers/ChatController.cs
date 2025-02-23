@@ -1,4 +1,6 @@
-﻿using ChatbotAI.Application.Chat.Queries.GetChatHistory;
+﻿using ChatbotAI.Application.Chat.Commands.AddChatMessage;
+using ChatbotAI.Application.Chat.Commands.RateChatResponse;
+using ChatbotAI.Application.Chat.Queries.GetChatHistory;
 using ChatbotAI.Application.Common.Models;
 using ChatbotAI.Web.Controllers;
 using MediatR;
@@ -15,6 +17,27 @@ public class ChatController : BaseController
     {
         var result = await _mediator.Send(new GetChatHistoryQuery());
 
+        return HandleResult(result);
+    }
+
+    [HttpPost("messages")]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Result<ChatResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Result<ChatResponseDto>))]
+    public async Task<IActionResult> AddChatMessage([FromBody] AddChatMessageCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return HandleResult(result);
+    }
+
+    [HttpPut("responses/{responseId}/rate")]
+    public async Task<IActionResult> RateChatResponse(int responseId, [FromBody] RateChatResponseCommand command)
+    {
+        if (responseId != command.ResponseId)
+        {
+            return BadRequest("Mismatched response ID.");
+        }
+
+        var result = await _mediator.Send(command);
         return HandleResult(result);
     }
 }

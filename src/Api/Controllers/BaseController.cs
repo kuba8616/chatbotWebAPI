@@ -24,4 +24,14 @@ public abstract class BaseController : ControllerBase
 
         return BadRequest(result);
     }
+
+    protected IActionResult HandleResult(Result result)
+    {
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+
+        return BadRequest(result);
+    }
 }

@@ -1,10 +1,12 @@
-﻿namespace ChatbotAI.Domain.Entities
+﻿using ChatbotAI.Domain.Common;
+
+namespace ChatbotAI.Domain.Entities
 {
-    public class ChatMessage
+    public class ChatMessage : ICreatedAt
     {
         public int Id { get; set; }
         public string Content { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
         public bool IsUserMessage { get; set; }
         public ChatResponse? Response { get; set; }
     }

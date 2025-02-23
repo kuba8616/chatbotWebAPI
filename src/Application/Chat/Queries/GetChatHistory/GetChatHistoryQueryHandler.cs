@@ -1,4 +1,5 @@
 ﻿using ChatbotAI.Application.Common;
+using ChatbotAI.Application.Common.Constants;
 using ChatbotAI.Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, R
     public async Task<Result<List<ChatMessageDto>>> Handle(GetChatHistoryQuery request, CancellationToken cancellationToken)
     {
         var result = await _context.ChatMessages
+            .AsNoTracking()
             .Include(c => c.Response)
             .OrderByDescending(c => c.CreatedAt)
             .Select(c => new ChatMessageDto
@@ -29,6 +31,6 @@ public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, R
 
         return result.Any()
             ? Result<List<ChatMessageDto>>.Ok(result)
-            : Result<List<ChatMessageDto>>.Fail("No chat history found.");
+            : Result<List<ChatMessageDto>>.Fail(ErrorMessages.ChatHistoryNotFound);
     }
 }
