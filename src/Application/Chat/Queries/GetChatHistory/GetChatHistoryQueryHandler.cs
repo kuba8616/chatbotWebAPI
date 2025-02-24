@@ -1,6 +1,5 @@
 ﻿using ChatbotAI.Application.Chat.Commands.AddChatMessage;
 using ChatbotAI.Application.Common;
-using ChatbotAI.Application.Common.Constants;
 using ChatbotAI.Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +18,7 @@ public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, R
     {
         var result = await _context.ChatResponses
             .Include(x => x.ChatMessage)
+            .AsNoTracking()
             .OrderBy(r => r.Id)
             .Select(r => new ChatResponseDto
             {
@@ -31,6 +31,6 @@ public class GetChatHistoryQueryHandler : IRequestHandler<GetChatHistoryQuery, R
             .ToListAsync(cancellationToken);
 
         return Result<List<ChatResponseDto>>.Ok(result);
-            
+
     }
 }
